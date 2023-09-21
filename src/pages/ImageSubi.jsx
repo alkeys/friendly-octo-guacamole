@@ -30,7 +30,7 @@ function ImageSubir() {
                 ctx.drawImage(image, 0, 0);
                 const base64 = canvas.toDataURL('image/png');
 
-                axios.post('http://127.0.0.1:5984/xd', { image: base64 }, {  //url de la base de datos papus
+                axios.post('http://localhost:5984/xd', { image: base64 }, {  //url de la base de datos papus
                     auth,//la utenticacion papus xd
                     headers: {
                         'Content-Type': 'application/json'
@@ -53,10 +53,17 @@ function ImageSubir() {
     };
 
     return (
-        <div>
+        <div className={"flex flex-col"} >
             <input type="file" accept="image/*" onChange={handleImageChange} />
             <button onClick={handleImageUpload}>Subir imagen</button>
+
+
+
+
         </div>
+
+
+
     );
 }
 

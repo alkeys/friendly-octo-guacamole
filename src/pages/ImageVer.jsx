@@ -1,27 +1,67 @@
-import { useState} from 'react';
-import axios from "axios";
 
-function ImageVer() {
-    const [imageSrc, setImageSrc] = useState('');
 
-    const auth = {
-        username: 'admin',
-        password: '1234'
-    }
 
-    axios.get('http://127.0.0.1:5984/xd/070e3eab03781798e79c5a0af400a0ae', {//base de datos selecionada con la cosa de la url del id
-        auth: auth
-    })
-        .then(response => setImageSrc(response.data.image))
-        .catch(error => console.error(error))
 
+
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+
+const ImageVer = () => {
+    const [dataObject, setDataObject] = useState({});
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const auth = {
+            username: 'admin',
+            password: 'couchdbtripv',
+        };
+
+        const urlbasexd="http://20.81.225.207:5984/sitio/";
+        const fetchData = async () => {
+            try {
+                // Realiza una solicitud GET a _all_docs para obtener todos los documentos
+                const response = await axios.get(urlbasexd+'_all_docs', {
+                    auth: auth,
+                });
+
+                // Extrae los IDs de los documentos
+                const documentIds = response.data.rows.map((row) => row.id);
+
+                // Inicializa un objeto para almacenar los datos de todos los documentos
+                const data = {};
+
+                // Recorre los documentos para obtener todos los datos
+                for (const documentId of documentIds) {
+                    const documentResponse = await axios.get(
+                        `${urlbasexd}/${documentId}`,
+                        {
+                            auth: auth,
+                        }
+                    );
+
+                    // Agrega los datos del documento al objeto utilizando el ID como clave
+                    data[documentId] = documentResponse.data;
+                }
+
+                // Establece el objeto de datos en el estado
+                setDataObject(data);
+            } catch (error) {
+                setError('Error al obtener los datos de los documentos: ' + error.message);
+            }
+        };
+ console.log(dataObject)
+        fetchData();
+    }, []);
 
     return (
         <div>
-
-            <img src={imageSrc} alt="imagen"/>
+            {error ? (
+                <p>{error}</p>
+            ) : (
+                <pre>{JSON.stringify(dataObject, null, 2)}</pre>
+            )}
         </div>
     );
-}
+};
 
 export default ImageVer;
